@@ -39,12 +39,16 @@ export default function Sidebar() {
     }
   };
 
-  const handleSaveNotionKey = async (notionKey) => {
+  const handleSaveNotionKey = async ({ notionKey, databaseId }) => {
     const user = auth.currentUser;
     if (user) {
       try {
         const userDocRef = doc(db, "users", user.email);
-        await setDoc(userDocRef, { notionApiKey: notionKey }, { merge: true });
+        await setDoc(
+          userDocRef,
+          { notionApiKey: notionKey, notionDatabaseId: databaseId },
+          { merge: true },
+        );
         console.log("Notion API Key updated successfully!");
       } catch (error) {
         console.error("Error updating Notion API Key: ", error);

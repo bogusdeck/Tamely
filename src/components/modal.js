@@ -2,10 +2,10 @@ import React, { useState } from "react";
 
 export default function Modal({ isOpen, onClose, handleSubmit }) {
   const [notionKey, setNotionKey] = useState("");
-
+  const [databaseId, setDatabaseId] = useState("");
   const onSubmit = (e) => {
     e.preventDefault();
-    handleSubmit(notionKey);
+    handleSubmit({ notionKey, databaseId });
     onClose();
   };
 
@@ -21,13 +21,21 @@ export default function Modal({ isOpen, onClose, handleSubmit }) {
         >
           X
         </button>
-        <h2 className="text-xl font-semibold mb-4">Update Notion Key</h2>
         <form onSubmit={onSubmit}>
+          <h2 className="text-xl font-semibold mb-4">Update Notion Key</h2>
           <input
             type="text"
             placeholder="Enter Notion API Key"
             value={notionKey}
             onChange={(e) => setNotionKey(e.target.value)}
+            className="w-full p-2 border rounded-md"
+          />
+          <h2 className="text-xl font-semibold mb-4">Update Database Id</h2>
+          <input
+            type="text"
+            placeholder="Enter your DatabaseId"
+            value={databaseId}
+            onChange={(e) => setDatabaseId(e.target.value)}
             className="w-full p-2 border rounded-md"
           />
           <button

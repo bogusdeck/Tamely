@@ -1,9 +1,24 @@
 import { Client } from "@notionhq/client";
+import { db, doc, getDoc } from "../lib/firebase"; // Adjust the import path as needed
 
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
+export const getNotionTable = async (userEmail) => {
+  // Fetch the user's Notion API key and Database ID from Firestore
+  const userDocRef = doc(db, "users", userEmail);
+  const docSnap = await getDoc(userDocRef);
 
-export const getNotionTable = async () => {
-  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!docSnap.exists()) {
+    throw new Error("User Notion credentials not found.");
+  }
+
+  const userData = docSnap.data();
+  const notionApiKey = userData.notionApiKey;
+  const databaseId = userData.notionDatabaseId;
+
+  if (!notionApiKey || !databaseId) {
+    throw new Error("Notion API Key or Database ID is missing.");
+  }
+
+  const notion = new Client({ auth: notionApiKey });
 
   const response = await notion.databases.query({
     database_id: databaseId,
