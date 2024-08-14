@@ -2,20 +2,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signOut, db, doc, getDoc, setDoc } from "../lib/firebase";
-import Dashboard from "../components/Dashboard";
-import NotionKeyForm from "../components/NotionKeyForm";
+import NotionKeyForm from "@/components/NotionKeyForm";
 
 export default function Home() {
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
+  const [notionKey, setNotionKey] = useState("");
   const [hasKey, setHasKey] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
-
   useEffect(() => {
-    if (loading) return;
-    if (!user) {
-      router.push("/"); // Redirect to login if not authenticated
-    } else {
+    if (user) {
       const checkNotionKey = async () => {
         const userDocRef = doc(db, "users", user.email);
         const docSnap = await getDoc(userDocRef);
@@ -25,17 +22,19 @@ export default function Home() {
             setHasKey(true);
           }
         }
+        setLoading(false);
       };
       checkNotionKey();
+    } else {
+      router.push("/");
     }
-  }, [user, loading, router]);
+  }, [user, router]);
 
-  const handleSubmit = async (notionKey) => {
-    if (user) {
-      const userDocRef = doc(db, "users", user.email);
-      await setDoc(userDocRef, { notionApiKey: notionKey }, { merge: true });
-      setHasKey(true);
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const userDocRef = doc(db, "users", user.email);
+    await setDoc(userDocRef, { notionApiKey: notionKey }, { merge: true });
+    setHasKey(true);
   };
 
   const handleLogout = async () => {
@@ -43,14 +42,14 @@ export default function Home() {
     router.push("/");
   };
 
-  if (loading) return <div>Loading ....</div>;
+  if (loading) return <div> Loading .... </div>;
 
   return (
     <div>
       {hasKey ? (
-        <Dashboard onLogout={handleLogout} />
+        <div> {/* Dashboard Component */} Welcome to your Dashboard!</div>
       ) : (
-        <NotionKeyForm onSubmit={handleSubmit} />
+        <NotionKeyForm />
       )}
     </div>
   );
