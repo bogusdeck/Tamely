@@ -1,49 +1,57 @@
-import React, { useEffect } from "react";
-import { getNotionTable } from "@/lib/notion";
+// components/Dashboard.js
+import React from "react";
 
-export default function Dashboard() {
-  const [notionData, setNotionData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getNotionTable();
-      setNotionData(data);
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) return <div>Loading....</div>;
+const Dashboard = ({ data, handleStart, handleStop, timers }) => {
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-gray-800 text-white">
           <tr>
-            <th className="py-2 px-4 border-b">Title</th>
-            <th className="py-2 px-4 border-b">Start Date</th>
-            <th className="py-2 px-4 border-b">End Date</th>
-            <th className="py-2 px-4 border-b">Total Time</th>
-            <th className="py-2 px-4 border-b">Estimated Time</th>
-            <th className="py-2 px-4 border-b">Status</th>
+            <th className="py-3 px-4 text-left">Title</th>
+            <th className="py-3 px-4 text-left">Status</th>
+            <th className="py-3 px-4 text-left">Start Date</th>
+            <th className="py-3 px-4 text-left">Time</th>
+            <th className="py-3 px-4 text-left">Total Time</th>
+            <th className="py-3 px-4 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          {notionData.map((row) => (
-            <tr key={row.id}>
-              <td className="py-2 px-4 border-b">{row.title}</td>
-              <td className="py-2 px-4 border-b">{row.startDate}</td>
-              <td className="py-2 px-4 border-b">{row.endDate}</td>
-              <td className="py-2 px-4 border-b">{row.totalTime}</td>
-              <td className="py-2 px-4 border-b">{row.estimatedTime}</td>
-              <td className="py-2 px-4 border-b">{row.status}</td>
+        <tbody className="text-gray-700">
+          {data.map((item, index) => (
+            <tr key={item.id}>
+              <td className="py-3 px-4">{item.title}</td>
+              <td className="py-3 px-4">{item.status}</td>
+              <td className="py-3 px-4">{item.startDate}</td>
+              <td className="py-3 px-4">{formatTime(item.time)}</td>
+              <td className="py-3 px-4">{formatTime(item.totalTime)}</td>
+              <td className="py-3 px-4">
+                {item.status === "Progress" ? (
+                  <button
+                    onClick={() => handleStop(index)}
+                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                  >
+                    Stop
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleStart(index)}
+                    className="px-2 py-1 bg-green-500 text-white rounded-md"
+                  >
+                    Start
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   );
-}
+};
+
+export default Dashboard;
