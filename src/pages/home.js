@@ -37,12 +37,39 @@ export default function HomePage() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      for (let i = 0; i < timers.length; i++) {
+        if (timers[i].running) {
+          const elapsedCycleTime =
+            (Date.now() - timers[i].startCycleTime) / 1000;
+          const elapsedTime = timers[i].elapsedTime + elapsedCycleTime;
+          const elapsedTotalTime =
+            timers[i].elapsedTotalTime + elapsedCycleTime;
+
+          const taskRef = doc(db, "tasks", data[i].id);
+          await updateDoc(taskRef, {
+            time: elapsedTime,
+            totalTime: elapsedTotalTime,
+            status: "Hault",
+          });
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [timers, data]);
+
   const handleStart = async (index) => {
     const updatedTimers = [...timers];
     if (!updatedTimers[index].running) {
       updatedTimers[index].running = true;
       updatedTimers[index].startCycleTime = Date.now();
-      updatedTimers[index].elapsedTime = 0; 
+      updatedTimers[index].elapsedTime = 0;
       setTimers(updatedTimers);
 
       const taskRef = doc(db, "tasks", data[index].id);
@@ -53,7 +80,7 @@ export default function HomePage() {
 
       await updateDoc(taskRef, {
         status: "Progress",
-        time: 0, 
+        time: 0,
       });
 
       updatedTimers[index].elapsedTotalTime = currentTotalTime;
@@ -98,23 +125,22 @@ export default function HomePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const taskToAdd = {
       ...formData,
       status: "Hault",
-      time: 0,        
-      totalTime: 0,   
+      time: 0,
+      totalTime: 0,
     };
-  
+
     try {
       await addDoc(collection(db, "tasks"), taskToAdd);
-  
+
       console.log("Task successfully added to Firestore");
     } catch (error) {
       console.error("Error adding task to Firestore:", error);
     }
   };
-  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -139,24 +165,6 @@ export default function HomePage() {
 
     return () => clearInterval(interval);
   }, [data, timers]);
-
-  useEffect(() => {
-    const handleBeforeUnload = async (e) => {
-      e.preventDefault();
-      for (let i = 0; i < timers.length; i++) {
-        if (timers[i].running) {
-          await handleStop(i);
-        }
-      }
-      e.returnValue = ''; // Required for the event to trigger
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [timers, data]);
 
   if (!user) {
     return <div>Loading...</div>;
@@ -199,7 +207,7 @@ export default function HomePage() {
         data={data}
         handleStart={handleStart}
         handleStop={handleStop}
-        timers={timers} 
+        timers={timers}
       />
     </div>
   );
