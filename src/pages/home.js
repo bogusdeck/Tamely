@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../lib/useAuth";
 import Dashboard from "../components/Dashboard";
+import CompleteTasks from "../components/CompleteTasks";
 import { db } from "../lib/firebase";
 import {
   collection,
@@ -13,7 +14,8 @@ import {
 
 export default function HomePage() {
   const { user } = useAuth();
-  const [data, setData] = useState([]);
+  const [activeTasks, setActiveTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
   const [timers, setTimers] = useState([]);
 
   useEffect(() => {
@@ -22,10 +24,18 @@ export default function HomePage() {
         ...doc.data(),
         id: doc.id,
       }));
-      setData(tasks);
+
+      // Separate tasks into two categories
+      const active = tasks.filter(
+        (task) => task.status === "Progress" || task.status === "Hault",
+      );
+      const completed = tasks.filter((task) => task.status === "Done");
+
+      setActiveTasks(active);
+      setCompletedTasks(completed);
 
       setTimers(
-        tasks.map((task) => ({
+        active.map((task) => ({
           elapsedTime: task.time || 0,
           elapsedTotalTime: task.totalTime || 0,
           running: false,
@@ -37,33 +47,6 @@ export default function HomePage() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const handleBeforeUnload = async () => {
-      for (let i = 0; i < timers.length; i++) {
-        if (timers[i].running) {
-          const elapsedCycleTime =
-            (Date.now() - timers[i].startCycleTime) / 1000;
-          const elapsedTime = timers[i].elapsedTime + elapsedCycleTime;
-          const elapsedTotalTime =
-            timers[i].elapsedTotalTime + elapsedCycleTime;
-
-          const taskRef = doc(db, "tasks", data[i].id);
-          await updateDoc(taskRef, {
-            time: elapsedTime,
-            totalTime: elapsedTotalTime,
-            status: "Hault",
-          });
-        }
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [timers, data]);
-
   const handleStart = async (index) => {
     const updatedTimers = [...timers];
     if (!updatedTimers[index].running) {
@@ -72,7 +55,7 @@ export default function HomePage() {
       updatedTimers[index].elapsedTime = 0;
       setTimers(updatedTimers);
 
-      const taskRef = doc(db, "tasks", data[index].id);
+      const taskRef = doc(db, "tasks", activeTasks[index].id);
       const taskDoc = await getDoc(taskRef);
       const currentTotalTime = taskDoc.exists()
         ? taskDoc.data().totalTime || 0
@@ -97,7 +80,7 @@ export default function HomePage() {
       updatedTimers[index].elapsedTime += elapsedCycleTime;
       updatedTimers[index].elapsedTotalTime += elapsedCycleTime;
 
-      const taskRef = doc(db, "tasks", data[index].id);
+      const taskRef = doc(db, "tasks", activeTasks[index].id);
       await updateDoc(taskRef, {
         time: updatedTimers[index].elapsedTime,
         totalTime: updatedTimers[index].elapsedTotalTime,
@@ -109,7 +92,7 @@ export default function HomePage() {
 
   const [formData, setFormData] = useState({
     title: "",
-    status: "hault",
+    status: "Hault",
     startDate: "",
     time: 0,
     totalTime: 0,
@@ -144,7 +127,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const updatedData = data.map((item, index) => {
+      const updatedActiveTasks = activeTasks.map((item, index) => {
         if (timers[index]?.running) {
           const elapsedCycleTime =
             (Date.now() - timers[index].startCycleTime) / 1000;
@@ -160,11 +143,11 @@ export default function HomePage() {
         }
         return item;
       });
-      setData(updatedData);
+      setActiveTasks(updatedActiveTasks);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [data, timers]);
+  }, [activeTasks, timers]);
 
   if (!user) {
     return <div>Loading...</div>;
@@ -204,11 +187,13 @@ export default function HomePage() {
       </form>
 
       <Dashboard
-        data={data}
+        data={activeTasks}
         handleStart={handleStart}
         handleStop={handleStop}
         timers={timers}
       />
+
+      <CompleteTasks data={completedTasks} />
     </div>
   );
 }
