@@ -17,7 +17,6 @@ export default function HomePage() {
   const [timers, setTimers] = useState([]);
 
   useEffect(() => {
-    // Set up real-time listener for tasks collection
     const unsubscribe = onSnapshot(collection(db, "tasks"), (snapshot) => {
       const tasks = snapshot.docs.map((doc) => ({
         ...doc.data(),
@@ -25,7 +24,6 @@ export default function HomePage() {
       }));
       setData(tasks);
 
-      // Initialize timers with data from Firestore
       setTimers(
         tasks.map((task) => ({
           elapsedTime: task.time || 0,
@@ -44,20 +42,18 @@ export default function HomePage() {
     if (!updatedTimers[index].running) {
       updatedTimers[index].running = true;
       updatedTimers[index].startCycleTime = Date.now();
-      updatedTimers[index].elapsedTime = 0; // Reset the time to 0 when starting
+      updatedTimers[index].elapsedTime = 0; 
       setTimers(updatedTimers);
 
-      // Fetch the current task data to get the existing total time
       const taskRef = doc(db, "tasks", data[index].id);
-      const taskDoc = await getDoc(taskRef); // Use getDoc to retrieve the document
+      const taskDoc = await getDoc(taskRef);
       const currentTotalTime = taskDoc.exists()
         ? taskDoc.data().totalTime || 0
         : 0;
 
-      // Update the task status to "Progress" and reset time while keeping totalTime
       await updateDoc(taskRef, {
         status: "Progress",
-        time: 0, // Reset time to 0
+        time: 0, 
       });
 
       updatedTimers[index].elapsedTotalTime = currentTotalTime;
@@ -74,12 +70,11 @@ export default function HomePage() {
       updatedTimers[index].elapsedTime += elapsedCycleTime;
       updatedTimers[index].elapsedTotalTime += elapsedCycleTime;
 
-      // Update the task in Firestore
       const taskRef = doc(db, "tasks", data[index].id);
       await updateDoc(taskRef, {
-        time: updatedTimers[index].elapsedTime, // Store time for the current session
-        totalTime: updatedTimers[index].elapsedTotalTime, // Store cumulative time
-        status: "Hault", // Change status to "Hault" when stopped
+        time: updatedTimers[index].elapsedTime,
+        totalTime: updatedTimers[index].elapsedTotalTime,
+        status: "Hault",
       });
       setTimers(updatedTimers);
     }
@@ -87,10 +82,10 @@ export default function HomePage() {
 
   const [formData, setFormData] = useState({
     title: "",
-    status: "Progress",
+    status: "hault",
     startDate: "",
-    time: 0, // Store time in seconds
-    totalTime: 0, // Store total time in seconds
+    time: 0,
+    totalTime: 0,
   });
 
   const handleChange = (e) => {
@@ -103,30 +98,23 @@ export default function HomePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Add the task to Firestore
-    const docRef = await addDoc(collection(db, "tasks"), formData);
-
-    const newTask = { ...formData, id: docRef.id };
-    setData((prevData) => [...prevData, newTask]);
-    setTimers((prevTimers) => [
-      ...prevTimers,
-      {
-        elapsedTime: 0,
-        elapsedTotalTime: 0,
-        running: false,
-        startCycleTime: null,
-      },
-    ]);
-
-    setFormData({
-      title: "",
-      status: "Progress",
-      startDate: "",
-      time: 0,
-      totalTime: 0,
-    });
+  
+    const taskToAdd = {
+      ...formData,
+      status: "Hault",
+      time: 0,        
+      totalTime: 0,   
+    };
+  
+    try {
+      await addDoc(collection(db, "tasks"), taskToAdd);
+  
+      console.log("Task successfully added to Firestore");
+    } catch (error) {
+      console.error("Error adding task to Firestore:", error);
+    }
   };
+  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -152,6 +140,24 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [data, timers]);
 
+  useEffect(() => {
+    const handleBeforeUnload = async (e) => {
+      e.preventDefault();
+      for (let i = 0; i < timers.length; i++) {
+        if (timers[i].running) {
+          await handleStop(i);
+        }
+      }
+      e.returnValue = ''; // Required for the event to trigger
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [timers, data]);
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -171,18 +177,6 @@ export default function HomePage() {
             className="px-4 py-2 border rounded-md"
             required
           />
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="px-4 py-2 border rounded-md"
-            required
-          >
-            <option value="Progress">Progress</option>
-            <option value="Done">Done</option>
-            <option value="Hault">Hault</option>
-            <option value="Dropped">Dropped</option>
-          </select>
           <input
             type="date"
             name="startDate"
@@ -205,7 +199,7 @@ export default function HomePage() {
         data={data}
         handleStart={handleStart}
         handleStop={handleStop}
-        timers={timers} // Pass the timers state here
+        timers={timers} 
       />
     </div>
   );
