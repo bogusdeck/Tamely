@@ -1,4 +1,3 @@
-// components/Dashboard.js
 import React from "react";
 
 const Dashboard = ({ data, handleStart, handleStop, timers }) => {
