@@ -30,8 +30,8 @@ export default function HomePage() {
         tasks.map((task) => ({
           elapsedTime: task.time || 0,
           elapsedTotalTime: task.totalTime || 0,
-          running: false,
-          startCycleTime: null,
+          running: task.status === "Progress",
+          startCycleTime: task.startCycleTime || null,
         })),
       );
     });
@@ -58,6 +58,7 @@ export default function HomePage() {
       await updateDoc(taskRef, {
         status: "Progress",
         time: 0, // Reset time to 0
+        startCycleTime: Date.now(), // Set the start cycle time
       });
 
       updatedTimers[index].elapsedTotalTime = currentTotalTime;
@@ -80,6 +81,7 @@ export default function HomePage() {
         time: updatedTimers[index].elapsedTime, // Store time for the current session
         totalTime: updatedTimers[index].elapsedTotalTime, // Store cumulative time
         status: "Hault", // Change status to "Hault" when stopped
+        startCycleTime: null, // Clear start cycle time
       });
       setTimers(updatedTimers);
     }
@@ -150,6 +152,34 @@ export default function HomePage() {
     }, 1000);
 
     return () => clearInterval(interval);
+  }, [data, timers]);
+
+  useEffect(() => {
+    const handleBeforeUnload = async (event) => {
+      for (let i = 0; i < timers.length; i++) {
+        if (timers[i].running) {
+          const elapsedCycleTime =
+            (Date.now() - timers[i].startCycleTime) / 1000;
+          const updatedTotalTime =
+            timers[i].elapsedTotalTime + elapsedCycleTime;
+
+          // Update the task status to "Hault" and save current time and totalTime
+          const taskRef = doc(db, "tasks", data[i].id);
+          await updateDoc(taskRef, {
+            time: timers[i].elapsedTime + elapsedCycleTime, // Store time for the current session
+            totalTime: updatedTotalTime, // Store cumulative time
+            status: "Hault", // Change status to "Hault" when stopped
+            startCycleTime: null, // Clear start cycle time
+          });
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
   }, [data, timers]);
 
   if (!user) {
