@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/router";
 import { signOut } from "firebase/auth";
 import { auth, db, doc, setDoc } from "../lib/firebase";
-import Modal from "./modal";
 
 export default function Sidebar() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const sidebarRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -33,26 +33,9 @@ export default function Sidebar() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      window.location.href = "/";
+      router.push("/");
     } catch (error) {
       console.error("Error signing out: ", error);
-    }
-  };
-
-  const handleSaveNotionKey = async ({ notionKey, databaseId }) => {
-    const user = auth.currentUser;
-    if (user) {
-      try {
-        const userDocRef = doc(db, "users", user.email);
-        await setDoc(
-          userDocRef,
-          { notionApiKey: notionKey, notionDatabaseId: databaseId },
-          { merge: true },
-        );
-        console.log("Notion API Key updated successfully!");
-      } catch (error) {
-        console.error("Error updating Notion API Key: ", error);
-      }
     }
   };
 
@@ -75,15 +58,6 @@ export default function Sidebar() {
             <li className="mt-4">
               <a href="#" className="hover:underline">
                 Timer
-              </a>
-            </li>
-            <li className="mt-4">
-              <a
-                href="#"
-                className="hover:underline"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Update Notion Key
               </a>
             </li>
             <li className="mt-4">
@@ -112,13 +86,6 @@ export default function Sidebar() {
           </button>
         </div>
       </div>
-
-      {/* Modal Component */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        handleSubmit={handleSaveNotionKey}
-      />
     </div>
   );
 }
