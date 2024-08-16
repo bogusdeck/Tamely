@@ -36,7 +36,7 @@ const Dashboard = ({ data, handleStart, handleStop, timers }) => {
       time: updatedElapsedTime,
       totalTime: updatedElapsedTotalTime,
       status: "Done",
-      endDate: endDate, // Add endDate when task is done
+      endDate: endDate,
     });
   };
 
@@ -103,4 +103,3 @@ const Dashboard = ({ data, handleStart, handleStop, timers }) => {
 };
 
 export default Dashboard;
-

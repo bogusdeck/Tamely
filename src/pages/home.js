@@ -25,7 +25,6 @@ export default function HomePage() {
         id: doc.id,
       }));
 
-      // Separate tasks into two categories
       const active = tasks.filter(
         (task) => task.status === "Progress" || task.status === "Hault",
       );
@@ -38,8 +37,8 @@ export default function HomePage() {
         active.map((task) => ({
           elapsedTime: task.time || 0,
           elapsedTotalTime: task.totalTime || 0,
-          running: false,
-          startCycleTime: null,
+          running: task.status === "Progress",
+          startCycleTime: task.status === "Progress" ? Date.now() : null,
         })),
       );
     });
@@ -47,13 +46,52 @@ export default function HomePage() {
     return () => unsubscribe();
   }, []);
 
+  // Update Firestore every 30 seconds for active tasks
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      activeTasks.forEach(async (task, index) => {
+        if (timers[index]?.running) {
+          const elapsedCycleTime =
+            (Date.now() - timers[index].startCycleTime) / 1000;
+
+          const updatedElapsedTime =
+            timers[index].elapsedTime + elapsedCycleTime;
+          const updatedElapsedTotalTime =
+            timers[index].elapsedTotalTime + elapsedCycleTime;
+
+          const taskRef = doc(db, "tasks", task.id);
+          await updateDoc(taskRef, {
+            time: updatedElapsedTime,
+            totalTime: updatedElapsedTotalTime,
+            status: "Progress",
+          });
+
+          // Update local state
+          setTimers((prevTimers) =>
+            prevTimers.map((timer, i) =>
+              i === index
+                ? {
+                    ...timer,
+                    elapsedTime: updatedElapsedTime,
+                    elapsedTotalTime: updatedElapsedTotalTime,
+                    startCycleTime: Date.now(),
+                  }
+                : timer,
+            ),
+          );
+        }
+      });
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [activeTasks, timers]);
+
   const handleStart = async (index) => {
     const updatedTimers = [...timers];
     if (!updatedTimers[index].running) {
       updatedTimers[index].running = true;
       updatedTimers[index].startCycleTime = Date.now();
       updatedTimers[index].elapsedTime = 0;
-      setTimers(updatedTimers);
 
       const taskRef = doc(db, "tasks", activeTasks[index].id);
       const taskDoc = await getDoc(taskRef);
