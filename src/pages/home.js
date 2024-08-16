@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../lib/useAuth";
 import Dashboard from "../components/Dashboard";
 import CompleteTasks from "../components/CompleteTasks";
@@ -17,6 +17,7 @@ export default function HomePage() {
   const [activeTasks, setActiveTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
   const [timers, setTimers] = useState([]);
+  const counterRef = useRef(0); // Counter ref to keep track of interval ticks
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "tasks"), (snapshot) => {
@@ -46,44 +47,91 @@ export default function HomePage() {
     return () => unsubscribe();
   }, []);
 
-  // Update Firestore every 30 seconds for active tasks
   useEffect(() => {
-    const interval = setInterval(async () => {
-      activeTasks.forEach(async (task, index) => {
-        if (timers[index]?.running) {
-          const elapsedCycleTime =
-            (Date.now() - timers[index].startCycleTime) / 1000;
+    const combinedInterval = setInterval(() => {
+      // Increment counter
+      counterRef.current += 1;
 
-          const updatedElapsedTime =
-            timers[index].elapsedTime + elapsedCycleTime;
-          const updatedElapsedTotalTime =
-            timers[index].elapsedTotalTime + elapsedCycleTime;
+      // UI Update
+      setActiveTasks((prevTasks) =>
+        prevTasks.map((item, index) => {
+          if (timers[index]?.running) {
+            const elapsedCycleTime =
+              (Date.now() - timers[index].startCycleTime) / 1000;
+            return {
+              ...item,
+              time: (timers[index].elapsedTime + elapsedCycleTime).toFixed(2),
+              totalTime: (
+                timers[index].elapsedTotalTime + elapsedCycleTime
+              ).toFixed(2),
+            };
+          }
+          return item;
+        }),
+      );
 
-          const taskRef = doc(db, "tasks", task.id);
-          await updateDoc(taskRef, {
-            time: updatedElapsedTime,
-            totalTime: updatedElapsedTotalTime,
-            status: "Progress",
-          });
+      // Firebase Update every 30 seconds
+      if (counterRef.current >= 30) {
+        console.log("Firebase update interval running");
+        const activeProgressTasks = activeTasks.filter(
+          (task) => task.status === "Progress",
+        );
 
-          // Update local state
-          setTimers((prevTimers) =>
-            prevTimers.map((timer, i) =>
-              i === index
-                ? {
-                    ...timer,
-                    elapsedTime: updatedElapsedTime,
-                    elapsedTotalTime: updatedElapsedTotalTime,
-                    startCycleTime: Date.now(),
-                  }
-                : timer,
-            ),
-          );
+        if (activeProgressTasks.length > 0) {
+          Promise.all(
+            activeProgressTasks.map(async (task, index) => {
+              const timerIndex = activeTasks.findIndex((t) => t.id === task.id);
+              if (timers[timerIndex]?.running) {
+                const elapsedCycleTime =
+                  (Date.now() - timers[timerIndex].startCycleTime) / 1000;
+
+                const updatedElapsedTime =
+                  timers[timerIndex].elapsedTime + elapsedCycleTime;
+                const updatedElapsedTotalTime =
+                  timers[timerIndex].elapsedTotalTime + elapsedCycleTime;
+
+                const taskRef = doc(db, "tasks", task.id);
+                await updateDoc(taskRef, {
+                  time: updatedElapsedTime,
+                  totalTime: updatedElapsedTotalTime,
+                  status: "Progress",
+                });
+
+                setTimers((prevTimers) =>
+                  prevTimers.map((timer, i) =>
+                    i === timerIndex
+                      ? {
+                          ...timer,
+                          elapsedTime: updatedElapsedTime,
+                          elapsedTotalTime: updatedElapsedTotalTime,
+                          startCycleTime: Date.now(),
+                        }
+                      : timer,
+                  ),
+                );
+
+                setActiveTasks((prevTasks) =>
+                  prevTasks.map((taskItem, i) =>
+                    i === timerIndex
+                      ? {
+                          ...taskItem,
+                          time: updatedElapsedTime,
+                          totalTime: updatedElapsedTotalTime,
+                        }
+                      : taskItem,
+                  ),
+                );
+              }
+            }),
+          ).catch((error) => console.error("Error updating Firestore:", error));
         }
-      });
-    }, 30000);
 
-    return () => clearInterval(interval);
+        // Reset counter
+        counterRef.current = 0;
+      }
+    }, 1000); // Runs every second
+
+    return () => clearInterval(combinedInterval);
   }, [activeTasks, timers]);
 
   const handleStart = async (index) => {
@@ -156,36 +204,11 @@ export default function HomePage() {
 
     try {
       await addDoc(collection(db, "tasks"), taskToAdd);
-
       console.log("Task successfully added to Firestore");
     } catch (error) {
       console.error("Error adding task to Firestore:", error);
     }
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const updatedActiveTasks = activeTasks.map((item, index) => {
-        if (timers[index]?.running) {
-          const elapsedCycleTime =
-            (Date.now() - timers[index].startCycleTime) / 1000;
-          const elapsedTotalTime =
-            timers[index].elapsedTotalTime + elapsedCycleTime;
-
-          const time = (timers[index].elapsedTime + elapsedCycleTime).toFixed(
-            2,
-          );
-          const totalTime = elapsedTotalTime.toFixed(2);
-
-          return { ...item, time, totalTime };
-        }
-        return item;
-      });
-      setActiveTasks(updatedActiveTasks);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [activeTasks, timers]);
 
   if (!user) {
     return <div>Loading...</div>;
