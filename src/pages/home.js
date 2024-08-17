@@ -10,7 +10,9 @@ import {
   doc,
   onSnapshot,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
+import Sidebar from "@/components/sidebar";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -20,32 +22,52 @@ export default function HomePage() {
   const counterRef = useRef(0); // Counter ref to keep track of interval ticks
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "tasks"), (snapshot) => {
-      const tasks = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+    if (user) {
+      const userCollectionRef = collection(db, user.displayName);
 
-      const active = tasks.filter(
-        (task) => task.status === "Progress" || task.status === "Hault",
-      );
-      const completed = tasks.filter((task) => task.status === "Done");
+      // Ensure e the user collection is created if it doesn't exist
+      const initializeUserCollection = async () => {
+        try {
+          const userDocRef = doc(userCollectionRef, "initialDocument");
+          const userDocSnapshot = await getDoc(userDocRef);
 
-      setActiveTasks(active);
-      setCompletedTasks(completed);
+          if (!userDocSnapshot.exists()) {
+            await setDoc(userDocRef, { initialized: true });
+          }
+        } catch (error) {
+          console.error("Error initializing user collection:", error);
+        }
+      };
 
-      setTimers(
-        active.map((task) => ({
-          elapsedTime: task.time || 0,
-          elapsedTotalTime: task.totalTime || 0,
-          running: task.status === "Progress",
-          startCycleTime: task.status === "Progress" ? Date.now() : null,
-        })),
-      );
-    });
+      initializeUserCollection();
 
-    return () => unsubscribe();
-  }, []);
+      const unsubscribe = onSnapshot(userCollectionRef, (snapshot) => {
+        const tasks = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+
+        const active = tasks.filter(
+          (task) => task.status === "Progress" || task.status === "Hault",
+        );
+        const completed = tasks.filter((task) => task.status === "Done");
+
+        setActiveTasks(active);
+        setCompletedTasks(completed);
+
+        setTimers(
+          active.map((task) => ({
+            elapsedTime: task.time || 0,
+            elapsedTotalTime: task.totalTime || 0,
+            running: task.status === "Progress",
+            startCycleTime: task.status === "Progress" ? Date.now() : null,
+          })),
+        );
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   useEffect(() => {
     const combinedInterval = setInterval(() => {
@@ -90,7 +112,7 @@ export default function HomePage() {
                 const updatedElapsedTotalTime =
                   timers[timerIndex].elapsedTotalTime + elapsedCycleTime;
 
-                const taskRef = doc(db, "tasks", task.id);
+                const taskRef = doc(db, user.displayName, task.id);
                 await updateDoc(taskRef, {
                   time: updatedElapsedTime,
                   totalTime: updatedElapsedTotalTime,
@@ -132,7 +154,7 @@ export default function HomePage() {
     }, 1000); // Runs every second
 
     return () => clearInterval(combinedInterval);
-  }, [activeTasks, timers]);
+  }, [activeTasks, timers, user]);
 
   const handleStart = async (index) => {
     const updatedTimers = [...timers];
@@ -141,7 +163,7 @@ export default function HomePage() {
       updatedTimers[index].startCycleTime = Date.now();
       updatedTimers[index].elapsedTime = 0;
 
-      const taskRef = doc(db, "tasks", activeTasks[index].id);
+      const taskRef = doc(db, user.displayName, activeTasks[index].id);
       const taskDoc = await getDoc(taskRef);
       const currentTotalTime = taskDoc.exists()
         ? taskDoc.data().totalTime || 0
@@ -166,7 +188,7 @@ export default function HomePage() {
       updatedTimers[index].elapsedTime += elapsedCycleTime;
       updatedTimers[index].elapsedTotalTime += elapsedCycleTime;
 
-      const taskRef = doc(db, "tasks", activeTasks[index].id);
+      const taskRef = doc(db, user.displayName, activeTasks[index].id);
       await updateDoc(taskRef, {
         time: updatedTimers[index].elapsedTime,
         totalTime: updatedTimers[index].elapsedTotalTime,
@@ -203,7 +225,8 @@ export default function HomePage() {
     };
 
     try {
-      await addDoc(collection(db, "tasks"), taskToAdd);
+      const userCollectionRef = collection(db, user.displayName);
+      await addDoc(userCollectionRef, taskToAdd);
       console.log("Task successfully added to Firestore");
     } catch (error) {
       console.error("Error adding task to Firestore:", error);
@@ -216,6 +239,7 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto mt-8">
+      <Sidebar />
       <h1 className="text-3xl font-bold mb-6">Welcome, {user.displayName}!</h1>
 
       <form onSubmit={handleSubmit} className="mb-6">
