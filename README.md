@@ -20,7 +20,8 @@
 - **Task Tracking**: Track task progress and completion with dynamic timers.
 - **Completed Tasks**: View tasks that are marked as completed.
 - **Dropped Tasks**: View tasks that are marked as dropped.
-- **Dashboard**: A central place to view ongoing tasks and task statistics.
+- **Dashboard**: A central place to view ongoing tasks, their statuses, and relevant statistics.
+- **Project Log**: Maintain a detailed log of all your projects.
 
 ## Technologies Used
 
