@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
-import DroppedTasksModal from "./DroppedTasksModal"; // Import the modal component
-import { useAuth } from "../lib/useAuth"; // Import your custom auth hook if needed to get user email
+import DroppedTasksModal from "./DroppedTasksModal";
+import { useAuth } from "../lib/useAuth";
+import { collection, getDocs, deleteDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 export default function Sidebar({ onProjectLogClick }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -11,7 +13,7 @@ export default function Sidebar({ onProjectLogClick }) {
     useState(false);
   const sidebarRef = useRef(null);
   const router = useRouter();
-  const { user } = useAuth(); // Assuming you have a custom hook to get the authenticated user
+  const { user } = useAuth();
   const userEmail = user?.email;
 
   useEffect(() => {
@@ -42,6 +44,35 @@ export default function Sidebar({ onProjectLogClick }) {
       router.push("/");
     } catch (error) {
       console.error("Error signing out: ", error);
+    }
+  };
+
+  const handleClearData = async () => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to clear all tasks data? This action cannot be undone.",
+    );
+    if (isConfirmed && userEmail) {
+      await clearUserData(userEmail);
+    }
+  };
+
+  const clearUserData = async (email) => {
+    try {
+      if (!email) throw new Error("No user email provided");
+
+      const userCollection = collection(db, email);
+      const querySnapshot = await getDocs(userCollection);
+
+      const initialDocumentId = "initialDocument"; // Replace with the actual ID or name of the initial document
+
+      const deletePromises = querySnapshot.docs
+        .filter((doc) => doc.id !== initialDocumentId)
+        .map((doc) => deleteDoc(doc.ref));
+
+      await Promise.all(deletePromises);
+      console.log("All user data cleared except initial document");
+    } catch (error) {
+      console.error("Error clearing user data: ", error);
     }
   };
 
@@ -78,6 +109,14 @@ export default function Sidebar({ onProjectLogClick }) {
               </button>
             </li>
             <li className="mt-4">
+              <button
+                onClick={handleClearData}
+                className="hover:underline text-red-500"
+              >
+                Clear All Tasks
+              </button>
+            </li>
+            <li className="mt-4">
               <a
                 href="https://bogusdeck.github.app"
                 className="hover:underline"
@@ -100,7 +139,7 @@ export default function Sidebar({ onProjectLogClick }) {
       {/* Dropped Tasks Modal */}
       {isDroppedTasksModalVisible && (
         <DroppedTasksModal
-          userEmail={userEmail} // Pass the user's email to the modal
+          userEmail={userEmail}
           isOpen={isDroppedTasksModalVisible}
           onClose={() => setIsDroppedTasksModalVisible(false)}
         />
