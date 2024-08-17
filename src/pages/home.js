@@ -25,7 +25,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (user) {
-      const userCollectionRef = collection(db, user.displayName);
+      const userCollectionRef = collection(db, user.email);
 
       // Ensure e the user collection is created if it doesn't exist
       const initializeUserCollection = async () => {
@@ -114,7 +114,7 @@ export default function HomePage() {
                 const updatedElapsedTotalTime =
                   timers[timerIndex].elapsedTotalTime + elapsedCycleTime;
 
-                const taskRef = doc(db, user.displayName, task.id);
+                const taskRef = doc(db, user.email, task.id);
                 await updateDoc(taskRef, {
                   time: updatedElapsedTime,
                   totalTime: updatedElapsedTotalTime,
@@ -165,7 +165,7 @@ export default function HomePage() {
       updatedTimers[index].startCycleTime = Date.now();
       updatedTimers[index].elapsedTime = 0;
 
-      const taskRef = doc(db, user.displayName, activeTasks[index].id);
+      const taskRef = doc(db, user.email, activeTasks[index].id);
       const taskDoc = await getDoc(taskRef);
       const currentTotalTime = taskDoc.exists()
         ? taskDoc.data().totalTime || 0
@@ -190,7 +190,7 @@ export default function HomePage() {
       updatedTimers[index].elapsedTime += elapsedCycleTime;
       updatedTimers[index].elapsedTotalTime += elapsedCycleTime;
 
-      const taskRef = doc(db, user.displayName, activeTasks[index].id);
+      const taskRef = doc(db, user.email, activeTasks[index].id);
       await updateDoc(taskRef, {
         time: updatedTimers[index].elapsedTime,
         totalTime: updatedTimers[index].elapsedTotalTime,
@@ -198,6 +198,54 @@ export default function HomePage() {
       });
       setTimers(updatedTimers);
     }
+  };
+
+  const handleDone = async (index) => {
+    const updatedTimers = [...timers];
+    if (updatedTimers[index].running) {
+      // Stop the timer if it's running
+      updatedTimers[index].running = false;
+      const elapsedCycleTime =
+        (Date.now() - updatedTimers[index].startCycleTime) / 1000;
+      updatedTimers[index].elapsedTime += elapsedCycleTime;
+      updatedTimers[index].elapsedTotalTime += elapsedCycleTime;
+    }
+
+    const taskRef = doc(db, user.email, activeTasks[index].id);
+    const endDate = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+    await updateDoc(taskRef, {
+      time: updatedTimers[index].elapsedTime,
+      totalTime: updatedTimers[index].elapsedTotalTime,
+      status: "Done",
+      endDate: endDate,
+    });
+
+    setTimers(updatedTimers);
+  };
+
+  const handleDrop = async (index) => {
+    const updatedTimers = [...timers];
+    if (updatedTimers[index].running) {
+      // Stop the timer if it's running
+      updatedTimers[index].running = false;
+      const elapsedCycleTime =
+        (Date.now() - updatedTimers[index].startCycleTime) / 1000;
+      updatedTimers[index].elapsedTime += elapsedCycleTime;
+      updatedTimers[index].elapsedTotalTime += elapsedCycleTime;
+    }
+
+    const taskRef = doc(db, user.email, activeTasks[index].id);
+    const endDate = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+    await updateDoc(taskRef, {
+      time: updatedTimers[index].elapsedTime,
+      totalTime: updatedTimers[index].elapsedTotalTime,
+      status: "Dropped",
+      endDate: endDate,
+    });
+
+    setTimers(updatedTimers);
   };
 
   const [formData, setFormData] = useState({
@@ -227,7 +275,7 @@ export default function HomePage() {
     };
 
     try {
-      const userCollectionRef = collection(db, user.displayName);
+      const userCollectionRef = collection(db, user.email);
       await addDoc(userCollectionRef, taskToAdd);
       console.log("Task successfully added to Firestore");
     } catch (error) {
@@ -280,6 +328,8 @@ export default function HomePage() {
         data={activeTasks}
         handleStart={handleStart}
         handleStop={handleStop}
+        handleDone={handleDone}
+        handleDrop={handleDrop}
         timers={timers}
       />
       <CompleteTasks data={completedTasks} />

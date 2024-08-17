@@ -2,81 +2,18 @@ import React from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
-const Dashboard = ({ data, handleStart, handleStop, timers, userEmail }) => {
+const Dashboard = ({
+  data,
+  handleStart,
+  handleStop,
+  handleDone,
+  handleDrop,
+  timers,
+}) => {
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
-  };
-
-  const updateTimeAndStatus = async (taskId, status, index) => {
-    try {
-      const elapsedCycleTime =
-        (Date.now() - timers[index].startCycleTime) / 1000;
-      const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
-      const updatedElapsedTotalTime =
-        timers[index].elapsedTotalTime + elapsedCycleTime;
-
-      const taskRef = doc(db, userEmail, taskId);
-      await updateDoc(taskRef, {
-        time: updatedElapsedTime,
-        totalTime: updatedElapsedTotalTime,
-        status: status,
-      });
-    } catch (error) {
-      console.error(
-        `Error updating task ${taskId} status to ${status}:`,
-        error,
-      );
-    }
-  };
-
-  const handleMarkDone = async (taskId, index) => {
-    try {
-      const elapsedCycleTime =
-        (Date.now() - timers[index].startCycleTime) / 1000;
-      const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
-      const updatedElapsedTotalTime =
-        timers[index].elapsedTotalTime + elapsedCycleTime;
-
-      const endDate = new Date().toLocaleDateString();
-
-      const taskRef = doc(db, userEmail, taskId);
-      await updateDoc(taskRef, {
-        time: updatedElapsedTime,
-        totalTime: updatedElapsedTotalTime,
-        status: "Done",
-        endDate: endDate,
-      });
-
-      console.log(`Task ${taskId} marked as Done`);
-    } catch (error) {
-      console.error(`Error marking task ${taskId} as Done:`, error);
-    }
-  };
-
-  const handleMarkDropped = async (taskId, index) => {
-    try {
-      const elapsedCycleTime =
-        (Date.now() - timers[index].startCycleTime) / 1000;
-      const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
-      const updatedElapsedTotalTime =
-        timers[index].elapsedTotalTime + elapsedCycleTime;
-
-      const endDate = new Date().toLocaleDateString();
-
-      const taskRef = doc(db, userEmail, taskId);
-      await updateDoc(taskRef, {
-        time: updatedElapsedTime,
-        totalTime: updatedElapsedTotalTime,
-        status: "Dropped",
-        endDate: endDate,
-      });
-
-      console.log(`Task ${taskId} marked as Dropped`);
-    } catch (error) {
-      console.error(`Error marking task ${taskId} as Dropped:`, error);
-    }
   };
 
   return (
@@ -117,14 +54,14 @@ const Dashboard = ({ data, handleStart, handleStop, timers, userEmail }) => {
                   </button>
                 )}
                 <button
-                  onClick={() => handleMarkDone(item.id, index)}
+                  onClick={() => handleDone(index)}
                   className="px-2 py-1 bg-blue-500 text-white rounded-md"
                 >
-                  Mark Done
+                  Done
                 </button>
                 <button
-                  onClick={() => handleMarkDropped(item.id, index)}
-                  className="px-2 py-1 bg-yellow-500 text-white rounded-md"
+                  onClick={() => handleDrop(index)}
+                  className="px-2 py-1 bg-gray-500 text-white rounded-md"
                 >
                   Drop
                 </button>

@@ -3,13 +3,16 @@ import { useRouter } from "next/router";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import DroppedTasksModal from "./DroppedTasksModal"; // Import the modal component
+import { useAuth } from "../lib/useAuth"; // Import your custom auth hook if needed to get user email
 
-export default function Sidebar({ onProjectLogClick, onDroppedTasksClick }) {
+export default function Sidebar({ onProjectLogClick }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isDroppedTasksModalVisible, setIsDroppedTasksModalVisible] =
     useState(false);
   const sidebarRef = useRef(null);
   const router = useRouter();
+  const { user } = useAuth(); // Assuming you have a custom hook to get the authenticated user
+  const userEmail = user?.email;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -97,6 +100,8 @@ export default function Sidebar({ onProjectLogClick, onDroppedTasksClick }) {
       {/* Dropped Tasks Modal */}
       {isDroppedTasksModalVisible && (
         <DroppedTasksModal
+          userEmail={userEmail} // Pass the user's email to the modal
+          isOpen={isDroppedTasksModalVisible}
           onClose={() => setIsDroppedTasksModalVisible(false)}
         />
       )}
