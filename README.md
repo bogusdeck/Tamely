@@ -43,7 +43,7 @@ To get a local copy of Tamely up and running, follow these steps:
 1. **Clone the repository**
 
     ```bash
-    git clone https://github.com/yourusername/tamely.git
+    git clone https://github.com/bogusdeck/tamely.git
     cd tamely
     ```
 
@@ -113,4 +113,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-For questions or feedback, you can reach out via [your email address] or open an issue on the repository.
+For questions or feedback, you can reach out via [tanishvashisth@gmail.com] or open an issue on the repository.
