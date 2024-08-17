@@ -1,3 +1,7 @@
+<div align="center">
+    ![sandglass-removebg-preview](https://github.com/user-attachments/assets/d1556d01-1c69-49e4-b43c-5271186b5920)
+</div>
+
 # Tamely
 
 **Tamely** is a web application for managing and tracking tasks, integrated with Firebase for authentication and data storage. The application allows users to track tasks, view completed tasks, and manage tasks through a user-friendly interface.
