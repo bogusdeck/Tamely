@@ -1,5 +1,5 @@
 <div align="center">
-    <a href="https://github.com/user-attachments/assets/d1556d01-1c69-49e4-b43c-5271186b5920"></a>
+    <img src="https://github.com/user-attachments/assets/d1556d01-1c69-49e4-b43c-5271186b5920"/>
 </div>
 
 # Tamely
