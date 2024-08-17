@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/d1556d01-1c69-49e4-b43c-5271186b5920" width="150"/>
+    <img src="https://github.com/user-attachments/assets/d1556d01-1c69-49e4-b43c-5271186b5920" width="250"/>
 </div>
 
 # Tamely
