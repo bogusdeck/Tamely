@@ -1,6 +1,7 @@
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/d1556d01-1c69-49e4-b43c-5271186b5920" width="250"/>
+    <img src="https://github.com/user-attachments/assets/30be4472-eda1-48dc-92f7-c0cde7943473" width="175"/>
 </div>
+
 
 # Tamely
 
