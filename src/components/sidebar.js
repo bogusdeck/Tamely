@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import { signOut } from "firebase/auth";
-import { auth, db, doc, setDoc } from "../lib/firebase";
+import { auth } from "../lib/firebase";
+import DroppedTasksModal from "./DroppedTasksModal"; // Import the modal component
 
-export default function Sidebar() {
+export default function Sidebar({ onProjectLogClick, onDroppedTasksClick }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [isDroppedTasksModalVisible, setIsDroppedTasksModalVisible] =
+    useState(false);
   const sidebarRef = useRef(null);
   const router = useRouter();
 
@@ -51,27 +54,31 @@ export default function Sidebar() {
           <h2 className="text-xl font-semibold">Sidebar</h2>
           <ul>
             <li className="mt-4">
-              <a href="#" className="hover:underline">
+              <button
+                onClick={() => router.push("/home")}
+                className="hover:underline"
+              >
                 DASH
-              </a>
+              </button>
             </li>
             <li className="mt-4">
-              <a href="#" className="hover:underline">
-                Timer
-              </a>
-            </li>
-            <li className="mt-4">
-              <a href="#" className="hover:underline">
-                Aesthetic Clock
-              </a>
-            </li>
-            <li className="mt-4">
-              <a href="#" className="hover:underline">
+              <button onClick={onProjectLogClick} className="hover:underline">
                 Project Log
-              </a>
+              </button>
             </li>
             <li className="mt-4">
-              <a href="#" className="hover:underline">
+              <button
+                onClick={() => setIsDroppedTasksModalVisible(true)}
+                className="hover:underline"
+              >
+                Dropped Tasks
+              </button>
+            </li>
+            <li className="mt-4">
+              <a
+                href="https://bogusdeck.github.app"
+                className="hover:underline"
+              >
                 Buy Me a Coffee
               </a>
             </li>
@@ -86,6 +93,13 @@ export default function Sidebar() {
           </button>
         </div>
       </div>
+
+      {/* Dropped Tasks Modal */}
+      {isDroppedTasksModalVisible && (
+        <DroppedTasksModal
+          onClose={() => setIsDroppedTasksModalVisible(false)}
+        />
+      )}
     </div>
   );
 }

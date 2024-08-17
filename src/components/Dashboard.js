@@ -2,7 +2,7 @@ import React from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
-const Dashboard = ({ data, handleStart, handleStop, timers }) => {
+const Dashboard = ({ data, handleStart, handleStop, timers, userEmail }) => {
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -10,38 +10,73 @@ const Dashboard = ({ data, handleStart, handleStop, timers }) => {
   };
 
   const updateTimeAndStatus = async (taskId, status, index) => {
-    const elapsedCycleTime = (Date.now() - timers[index].startCycleTime) / 1000;
-    const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
-    const updatedElapsedTotalTime =
-      timers[index].elapsedTotalTime + elapsedCycleTime;
+    try {
+      const elapsedCycleTime =
+        (Date.now() - timers[index].startCycleTime) / 1000;
+      const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
+      const updatedElapsedTotalTime =
+        timers[index].elapsedTotalTime + elapsedCycleTime;
 
-    const taskRef = doc(db, "tasks", taskId);
-    await updateDoc(taskRef, {
-      time: updatedElapsedTime,
-      totalTime: updatedElapsedTotalTime,
-      status: status,
-    });
+      const taskRef = doc(db, userEmail, taskId);
+      await updateDoc(taskRef, {
+        time: updatedElapsedTime,
+        totalTime: updatedElapsedTotalTime,
+        status: status,
+      });
+    } catch (error) {
+      console.error(
+        `Error updating task ${taskId} status to ${status}:`,
+        error,
+      );
+    }
   };
 
   const handleMarkDone = async (taskId, index) => {
-    const elapsedCycleTime = (Date.now() - timers[index].startCycleTime) / 1000;
-    const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
-    const updatedElapsedTotalTime =
-      timers[index].elapsedTotalTime + elapsedCycleTime;
+    try {
+      const elapsedCycleTime =
+        (Date.now() - timers[index].startCycleTime) / 1000;
+      const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
+      const updatedElapsedTotalTime =
+        timers[index].elapsedTotalTime + elapsedCycleTime;
 
-    const endDate = new Date().toLocaleDateString();
+      const endDate = new Date().toLocaleDateString();
 
-    const taskRef = doc(db, "tasks", taskId);
-    await updateDoc(taskRef, {
-      time: updatedElapsedTime,
-      totalTime: updatedElapsedTotalTime,
-      status: "Done",
-      endDate: endDate,
-    });
+      const taskRef = doc(db, userEmail, taskId);
+      await updateDoc(taskRef, {
+        time: updatedElapsedTime,
+        totalTime: updatedElapsedTotalTime,
+        status: "Done",
+        endDate: endDate,
+      });
+
+      console.log(`Task ${taskId} marked as Done`);
+    } catch (error) {
+      console.error(`Error marking task ${taskId} as Done:`, error);
+    }
   };
 
   const handleMarkDropped = async (taskId, index) => {
-    await updateTimeAndStatus(taskId, "Dropped", index);
+    try {
+      const elapsedCycleTime =
+        (Date.now() - timers[index].startCycleTime) / 1000;
+      const updatedElapsedTime = timers[index].elapsedTime + elapsedCycleTime;
+      const updatedElapsedTotalTime =
+        timers[index].elapsedTotalTime + elapsedCycleTime;
+
+      const endDate = new Date().toLocaleDateString();
+
+      const taskRef = doc(db, userEmail, taskId);
+      await updateDoc(taskRef, {
+        time: updatedElapsedTime,
+        totalTime: updatedElapsedTotalTime,
+        status: "Dropped",
+        endDate: endDate,
+      });
+
+      console.log(`Task ${taskId} marked as Dropped`);
+    } catch (error) {
+      console.error(`Error marking task ${taskId} as Dropped:`, error);
+    }
   };
 
   return (

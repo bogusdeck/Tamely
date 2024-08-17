@@ -13,6 +13,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import Sidebar from "@/components/sidebar";
+import ProjectLog from "@/components/project-log";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export default function HomePage() {
   const [completedTasks, setCompletedTasks] = useState([]);
   const [timers, setTimers] = useState([]);
   const counterRef = useRef(0); // Counter ref to keep track of interval ticks
+  const [isProjectLogVisible, setIsProjectLogVisible] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -233,15 +235,19 @@ export default function HomePage() {
     }
   };
 
+  const toggleProjectLog = () => {
+    setIsProjectLogVisible((prev) => !prev);
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="container mx-auto mt-8">
-      <Sidebar />
+      <Sidebar onProjectLogClick={toggleProjectLog} />
+      <ProjectLog isVisible={isProjectLogVisible} onClose={toggleProjectLog} />
       <h1 className="text-3xl font-bold mb-6">Welcome, {user.displayName}!</h1>
-
       <form onSubmit={handleSubmit} className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
@@ -270,14 +276,12 @@ export default function HomePage() {
           Add Entry
         </button>
       </form>
-
       <Dashboard
         data={activeTasks}
         handleStart={handleStart}
         handleStop={handleStop}
         timers={timers}
       />
-
       <CompleteTasks data={completedTasks} />
     </div>
   );
