@@ -18,8 +18,8 @@ const Dashboard = ({
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full bg-white">
-        <thead className="bg-gray-800 text-white">
+      <table className="min-w-full blackbg">
+        <thead className="yellowbg blacktxt">
           <tr>
             <th className="py-3 px-4 text-left">Title</th>
             <th className="py-3 px-4 text-left">Status</th>
@@ -32,38 +32,38 @@ const Dashboard = ({
         <tbody className="text-gray-700">
           {data.map((item, index) => (
             <tr key={item.id}>
-              <td className="py-3 px-4">{item.title}</td>
-              <td className="py-3 px-4">{item.status}</td>
-              <td className="py-3 px-4">{item.startDate}</td>
-              <td className="py-3 px-4">{formatTime(item.time)}</td>
-              <td className="py-3 px-4">{formatTime(item.totalTime)}</td>
-              <td className="py-3 px-4 space-x-2">
+              <td className="py-3 px-4 yellowtxt">{item.title}</td>
+              <td className="py-3 px-4 yellowtxt">{item.status}</td>
+              <td className="py-3 px-4 yellowtxt">{item.startDate}</td>
+              <td className="py-3 px-4 yellowtxt">{formatTime(item.time)}</td>
+              <td className="py-3 px-4 yellowtxt">{formatTime(item.totalTime)}</td>
+              <td className="py-3 px-4 flex items-center justify-center">
                 {item.status === "Progress" ? (
                   <button
                     onClick={() => handleStop(index)}
-                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                    className="px-2 py-1"
                   >
-                    Stop
+                    <img src="pause.png" className="h-8" />
                   </button>
                 ) : (
                   <button
                     onClick={() => handleStart(index)}
-                    className="px-2 py-1 bg-green-500 text-white rounded-md"
+                    className="px-2 py-1"
                   >
-                    Start
+                    <img src="play.png" className="h-8 "></img>
                   </button>
                 )}
                 <button
                   onClick={() => handleDone(index)}
-                  className="px-2 py-1 bg-blue-500 text-white rounded-md"
+                  className="px-2 py-1"
                 >
-                  Done
+                  <img className="h-8 " src="done.png"></img>
                 </button>
                 <button
                   onClick={() => handleDrop(index)}
-                  className="px-2 py-1 bg-gray-500 text-white rounded-md"
+                  className="px-2 py-1"
                 >
-                  Drop
+                  <img className="h-8 " src="drop.png" ></img>
                 </button>
               </td>
             </tr>

@@ -304,7 +304,7 @@ export default function HomePage() {
             placeholder="Title"
             value={formData.title}
             onChange={handleChange}
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 blacktxt font-medium"
             required
           />
           <input
@@ -313,13 +313,13 @@ export default function HomePage() {
             placeholder="Start Date"
             value={formData.startDate}
             onChange={handleChange}
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 blacktxt font-medium"
             required
           />
         </div>
         <button
           type="submit"
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          className="mt-4 px-4 py-2 yellowbg blacktxt font-medium hover:scale-110"
         >
           Add Entry
         </button>

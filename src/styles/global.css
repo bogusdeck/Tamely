@@ -3,5 +3,21 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-100;
+  @apply bg-[#090a0f];
+}
+
+.yellowbg {
+  @apply bg-[#e8c069]; 
+}
+
+.blackbg {
+  @apply bg-[#090a0f]
+}
+
+.yellowtxt {
+  @apply text-[#e8c069];
+}
+
+.blacktxt {
+  @apply text-[#090a0f];
 }

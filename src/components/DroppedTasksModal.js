@@ -35,17 +35,17 @@ const DroppedTasksModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="modal-backdrop fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-      <div className="modal-content bg-white rounded-lg shadow-lg overflow-x-auto w-full max-w-4xl relative">
+      <div className="modal-content blackbg shadow-lg overflow-x-auto w-full max-w-4xl relative">
         <button
-          className="close-button absolute top-2 right-2 text-gray-500 bg-gray-200 rounded-full p-2 hover:bg-gray-300"
+          className="close-button absolute top-2 right-2 blacktxt bg-gray-200 rounded-full px-2 pb-1 hover:scale-105"
           onClick={onClose}
         >
           &times;
         </button>
         <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Dropped Tasks</h2>
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead className="bg-gray-800 text-white">
+          <h2 className="text-2xl font-bold mb-4 yellowtxt">Dropped Tasks</h2>
+          <table className="min-w-full">
+            <thead className="yellowbg blacktxt">
               <tr>
                 <th className="py-3 px-4 text-left">Title</th>
                 <th className="py-3 px-4 text-left">Status</th>
@@ -54,7 +54,7 @@ const DroppedTasksModal = ({ isOpen, onClose }) => {
                 <th className="py-3 px-4 text-left">End Date</th>
               </tr>
             </thead>
-            <tbody className="text-gray-700">
+            <tbody className="yellowtxt">
               {droppedTasks.length > 0 ? (
                 droppedTasks.map((task) => (
                   <tr key={task.id}>

@@ -80,19 +80,19 @@ export default function Sidebar({ onProjectLogClick }) {
     <div>
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-full bg-gray-800 text-white transform ${
+        className={`fixed top-0 left-0 h-full blackbg yellowtxt border-r-2 border-[#e8c069] transform ${
           isSidebarVisible ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out w-64`}
+        } transition-transform duration-300 ease-in-out w-3/12`}
       >
         <div className="p-4">
-          <h2 className="text-xl font-semibold">Sidebar</h2>
+          <h2 className="text-2xl font-bold">Tamely</h2>
           <ul>
             <li className="mt-4">
               <button
                 onClick={() => router.push("/home")}
                 className="hover:underline"
               >
-                DASH
+                Dashboard
               </button>
             </li>
             <li className="mt-4">
@@ -129,7 +129,7 @@ export default function Sidebar({ onProjectLogClick }) {
         <div className="absolute bottom-4 left-0 w-full px-4">
           <button
             onClick={handleLogout}
-            className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            className="w-full inline-flex justify-center py-2 px-4 shadow-sm text-sm font-medium blacktxt yellowbg hover:scale-110"
           >
             Logout
           </button>

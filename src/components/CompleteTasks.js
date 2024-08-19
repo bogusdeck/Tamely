@@ -4,8 +4,8 @@ const CompleteTasks = ({ data }) => {
   return (
     <div className="overflow-x-auto mt-8">
       <h2 className="text-2xl font-bold mb-4">Complete Tasks</h2>
-      <table className="min-w-full bg-white">
-        <thead className="bg-gray-800 text-white">
+      <table className="min-w-full">
+        <thead className="yellowbg blacktxt">
           <tr>
             <th className="py-3 px-4 text-left">Title</th>
             <th className="py-3 px-4 text-left">Status</th>
@@ -17,11 +17,11 @@ const CompleteTasks = ({ data }) => {
         <tbody className="text-gray-700">
           {data.map((item) => (
             <tr key={item.id}>
-              <td className="py-3 px-4">{item.title}</td>
-              <td className="py-3 px-4">{item.status}</td>
-              <td className="py-3 px-4">{item.startDate}</td>
-              <td className="py-3 px-4">{item.totalTime.toFixed(2)}</td>
-              <td className="py-3 px-4">{item.endDate}</td>
+              <td className="py-3 px-4 yellowtxt">{item.title}</td>
+              <td className="py-3 px-4 yellowtxt">{item.status}</td>
+              <td className="py-3 px-4 yellowtxt">{item.startDate}</td>
+              <td className="py-3 px-4 yellowtxt">{item.totalTime.toFixed(2)}</td>
+              <td className="py-3 px-4 yellowtxt">{item.endDate}</td>
             </tr>
           ))}
         </tbody>
