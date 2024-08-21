@@ -18,6 +18,9 @@
 </a>
 </div>
 
+## API DOCS
+[here](https://boguscode.notion.site/BRS-930bba0cd24d41569a4f3e714ec559b0?pvs=4)
+
 ## Features
 
 - **Authentication**: Secure sign-in with Firebase Authentication.
