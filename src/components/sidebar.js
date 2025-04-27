@@ -15,7 +15,7 @@ export default function Sidebar({ onProjectLogClick }) {
   const router = useRouter();
   const { user } = useAuth();
   const userEmail = user?.email;
-
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -70,7 +70,6 @@ export default function Sidebar({ onProjectLogClick }) {
         .map((doc) => deleteDoc(doc.ref));
 
       await Promise.all(deletePromises);
-      console.log("All user data cleared except initial document");
     } catch (error) {
       console.error("Error clearing user data: ", error);
     }
@@ -110,6 +109,14 @@ export default function Sidebar({ onProjectLogClick }) {
             </li>
             <li className="mt-4">
               <button
+                onClick={() => router.push("/clock")}
+                className="hover:underline"
+              >
+                Clock
+              </button>
+            </li>
+            <li className="mt-4">
+              <button
                 onClick={handleClearData}
                 className="hover:underline text-red-500"
               >
@@ -117,12 +124,14 @@ export default function Sidebar({ onProjectLogClick }) {
               </button>
             </li>
             <li className="mt-4">
-              <a
-                href="https://bogusdeck.github.app"
-                className="hover:underline"
-              >
-                Buy Me a Coffee
-              </a>
+                <a 
+                  href="https://www.buymeacoffee.com/bogusdeck"
+                  taget="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  Buy Me a Coffee
+                </a>
             </li>
           </ul>
         </div>
