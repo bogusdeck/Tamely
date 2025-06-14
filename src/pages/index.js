@@ -306,7 +306,7 @@ export default function LandingPage() {
             </div>
             
             <button
-              onClick={handleGoogleLogin}
+              onClick={handleGoogleAuth}
               disabled={loading}
               className="mt-4 w-full flex justify-center items-center gap-2 py-2 px-4 border border-dark-border rounded-md bg-dark-secondary hover:bg-dark-hover transition-colors duration-200"
             >
