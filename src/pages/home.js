@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiUser, FiPlusCircle, FiClock } from "react-icons/fi";
 import { useAuth } from "../lib/useAuth";
+import Dashboard from "../components/Dashboard";
+import CompleteTasks from "../components/CompleteTasks";
+import Sidebar from "../components/Sidebar";
+import ProjectLog from "../components/project-log";
 import { db } from "../lib/firebase";
 import {
   collection,
@@ -12,61 +16,9 @@ import {
   setDoc,
 } from "firebase/firestore";
 
-// Placeholder components to avoid build errors
-const Sidebar = ({ onProjectLogClick }) => (
-  <div className="fixed left-0 top-0 h-full w-16 bg-dark-tertiary p-4 flex flex-col items-center">
-    <button onClick={onProjectLogClick} className="mt-8 text-dark-accent hover:text-dark-accentHover">
-      <FiClock size={24} />
-    </button>
-  </div>
-);
 
-const ProjectLog = ({ isVisible, onClose }) => (
-  isVisible ? (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-dark-secondary p-6 rounded-lg max-w-2xl w-full">
-        <h2 className="text-xl font-bold text-dark-text mb-4">Project Log</h2>
-        <button onClick={onClose} className="absolute top-4 right-4 text-dark-muted hover:text-dark-text">
-          Close
-        </button>
-      </div>
-    </div>
-  ) : null
-);
 
-const Dashboard = ({ activeTasks }) => (
-  <div className="bg-dark-secondary p-4 rounded-lg">
-    <h2 className="text-xl font-bold text-dark-text mb-4">Active Tasks</h2>
-    {activeTasks.length === 0 ? (
-      <p className="text-dark-muted">No active tasks</p>
-    ) : (
-      <ul>
-        {activeTasks.map(task => (
-          <li key={task.id} className="mb-2 p-3 bg-dark-tertiary rounded-lg">
-            {task.title}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-);
 
-const CompleteTasks = ({ completedTasks }) => (
-  <div className="bg-dark-secondary p-4 rounded-lg">
-    <h2 className="text-xl font-bold text-dark-text mb-4">Completed Tasks</h2>
-    {completedTasks.length === 0 ? (
-      <p className="text-dark-muted">No completed tasks</p>
-    ) : (
-      <ul>
-        {completedTasks.map(task => (
-          <li key={task.id} className="mb-2 p-3 bg-dark-tertiary rounded-lg">
-            {task.title}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-);
 
 export default function HomePage() {
   const { user } = useAuth();
