@@ -3,6 +3,12 @@
 </div>
 
 
+
+https://github.com/user-attachments/assets/5ffce46e-8fd6-469d-a7f3-d9382c73ca69
+
+
+
+
 # Tamely
 
 **Tamely** is a web application for managing and tracking tasks, integrated with Firebase for authentication and data storage. The application allows users to track tasks, view completed tasks, and manage tasks through a user-friendly interface.
@@ -17,9 +23,6 @@
     <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="150" />
 </a>
 </div>
-
-## API DOCS
-[here](https://boguscode.notion.site/BRS-930bba0cd24d41569a4f3e714ec559b0?pvs=4)
 
 ## Features
 
