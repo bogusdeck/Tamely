@@ -6,6 +6,7 @@ import CompleteTasks from "../components/CompleteTasks";
 import Sidebar from "../components/Sidebar";
 import ProjectLog from "../components/project-log";
 import { db } from "../lib/firebase";
+import { FiBarChart2, FiFileText, FiTrash2, FiBroom, FiMenu, FiX, FiLogOut } from "react-icons/fi";
 import {
   collection,
   addDoc,
@@ -15,7 +16,6 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-
 
 
 

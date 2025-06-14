@@ -6,7 +6,7 @@ import DroppedTasksModal from "./DroppedTasksModal";
 import { useAuth } from "../lib/useAuth";
 import { collection, getDocs, deleteDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import { FiBarChart2, FiFileText, FiTrash2, FiBroom, FiMenu, FiX, FiLogOut } from "react-icons/fi";
+import { FiBarChart2, FiFileText, FiTrash2, FiTrash, FiMenu, FiX, FiLogOut } from "react-icons/fi";
 
 export default function Sidebar({ onProjectLogClick }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -81,7 +81,7 @@ export default function Sidebar({ onProjectLogClick }) {
     { id: "dashboard", label: "Dashboard", icon: FiBarChart2 },
     { id: "projectLog", label: "Project Log", icon: FiFileText },
     { id: "droppedTasks", label: "Dropped Tasks", icon: FiTrash2 },
-    { id: "clearData", label: "Clear All Tasks", icon: FiBroom, danger: true },
+    { id: "clearData", label: "Clear All Tasks", icon: FiTrash, danger: true },
   ];
 
   useEffect(() => {
