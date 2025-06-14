@@ -13,8 +13,8 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import Sidebar from "@/components/Sidebar";
-import ProjectLog from "@/components/project-log";
+import Sidebar from "../components/Sidebar";
+import ProjectLog from "../components/project-log";
 
 export default function HomePage() {
   const { user } = useAuth();
