@@ -2,22 +2,159 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-[#090a0f];
+/* Degular Font */
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/DegularDisplay-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/DegularDisplay-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/DegularDisplay-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/DegularDisplay-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/DegularDisplay-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Degular';
+  src: url('/fonts/DegularDisplay-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-primary: #1a1b26;
+  --color-secondary: #24283b;
+  --color-tertiary: #2c3042;
+  --color-accent: #e8c069;
+  --color-accent-hover: #f0d08a;
+  --color-accent-secondary: #7aa2f7;
+  --color-text: #f3f4f6;
+  --color-muted: #9ca3af;
+  --color-border: #414868;
+  --color-hover: #414868;
+}
+
+body {
+  @apply bg-dark-primary text-dark-text font-sans;
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  font-family: 'Degular', system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-image: radial-gradient(circle at 15% 50%, rgba(122, 162, 247, 0.05), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(232, 192, 105, 0.05), transparent 25%);
+}
+
+/* Custom utility classes */
 .yellowbg {
-  @apply bg-[#e8c069]; 
+  @apply bg-dark-accent;
+  background-color: var(--color-accent);
 }
 
 .blackbg {
-  @apply bg-[#090a0f]
+  @apply bg-dark-primary;
+  background-color: var(--color-primary);
 }
 
 .yellowtxt {
-  @apply text-[#e8c069];
+  @apply text-dark-accent;
+  color: var(--color-accent);
 }
 
 .blacktxt {
-  @apply text-[#090a0f];
+  @apply text-dark-primary;
+  color: var(--color-primary);
+}
+
+/* Component styling */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md transition-all duration-300 ease-in-out;
+  }
+  
+  .btn-primary {
+    @apply btn bg-dark-accent text-dark-primary hover:bg-dark-accentHover hover:shadow-glow transform hover:-translate-y-0.5;
+  }
+  
+  .btn-outline {
+    @apply btn border border-dark-accent text-dark-accent hover:bg-dark-accent hover:text-dark-primary hover:shadow-glow transform hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply btn bg-dark-accentSecondary text-dark-primary hover:opacity-90 hover:shadow-glow-blue transform hover:-translate-y-0.5;
+  }
+  
+  .card {
+    @apply bg-dark-secondary rounded-lg shadow-dark p-4 hover:shadow-dark-lg transition-shadow duration-300;
+  }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-dark-secondary to-dark-tertiary rounded-lg shadow-dark p-4;
+  }
+  
+  .table-header {
+    @apply bg-gradient-to-r from-dark-accent to-dark-accentHover text-dark-primary font-medium;
+  }
+  
+  .table-row {
+    @apply border-b border-dark-border hover:bg-dark-hover transition-colors duration-200;
+  }
+  
+  .input {
+    @apply bg-dark-tertiary border border-dark-border rounded-md px-3 py-2 text-dark-text focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent transition-all duration-200;
+  }
+
+  .sidebar-item {
+    @apply flex items-center w-full p-2 rounded-md transition-all duration-200 text-dark-text hover:bg-dark-hover hover:text-dark-accent hover:translate-x-1;
+  }
+
+  .animate-on-scroll {
+    @apply opacity-0 transition-all duration-500 ease-out;
+  }
+
+  .animate-on-scroll.visible {
+    @apply opacity-100;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-primary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-dark-border rounded-full hover:bg-dark-accent transition-colors duration-200;
+  }
 }

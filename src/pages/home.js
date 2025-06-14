@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { FiUser, FiPlusCircle, FiClock } from "react-icons/fi";
 import { useAuth } from "../lib/useAuth";
 import Dashboard from "../components/Dashboard";
 import CompleteTasks from "../components/CompleteTasks";
@@ -12,7 +13,7 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import Sidebar from "@/components/sidebar";
+import Sidebar from "@/components/Sidebar";
 import ProjectLog from "@/components/project-log";
 
 export default function HomePage() {
@@ -288,51 +289,101 @@ export default function HomePage() {
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-dark-primary flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-dark-accent to-dark-accentSecondary mx-auto flex items-center justify-center animate-pulse shadow-glow-accent">
+            <FiClock className="text-4xl text-dark-primary" />
+          </div>
+          <h2 className="mt-6 text-2xl font-bold text-dark-accent animate-bounce-subtle">Loading Tamely</h2>
+          <p className="mt-2 text-dark-muted">Please wait while we prepare your dashboard</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto mt-8">
+    <div className="min-h-screen bg-dark-primary">
       <Sidebar onProjectLogClick={toggleProjectLog} />
       <ProjectLog isVisible={isProjectLogVisible} onClose={toggleProjectLog} />
-      <h1 className="text-3xl font-bold mb-6">Welcome, {user.displayName}!</h1>
-      <form onSubmit={handleSubmit} className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            value={formData.title}
-            onChange={handleChange}
-            className="px-4 py-2 blacktxt font-medium"
-            required
-          />
-          <input
-            type="date"
-            name="startDate"
-            placeholder="Start Date"
-            value={formData.startDate}
-            onChange={handleChange}
-            className="px-4 py-2 blacktxt font-medium"
-            required
-          />
+      
+      <div className="container mx-auto pt-8 px-4 pb-16 animate-fade-in">
+        <div className="flex items-center mb-8 animate-slide-up">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-dark-accent to-dark-accentSecondary flex items-center justify-center mr-4 shadow-glow-accent">
+            <FiUser className="text-xl text-dark-primary" />
+          </div>
+          <h1 className="text-3xl font-bold text-dark-text">
+            Welcome, <span className="text-dark-accent">{user.displayName}</span>!
+          </h1>
         </div>
-        <button
-          type="submit"
-          className="mt-4 px-4 py-2 yellowbg blacktxt font-medium hover:scale-110"
-        >
-          Add Entry
-        </button>
-      </form>
-      <Dashboard
-        data={activeTasks}
-        handleStart={handleStart}
-        handleStop={handleStop}
-        handleDone={handleDone}
-        handleDrop={handleDrop}
-        timers={timers}
-      />
-      <CompleteTasks data={completedTasks} />
+        
+        <div className="bg-gradient-to-b from-dark-secondary to-dark-tertiary rounded-lg shadow-dark-lg p-6 mb-8 animate-slide-up" style={{animationDelay: '100ms'}}>
+          <h2 className="text-xl font-bold text-dark-accent mb-4 flex items-center">
+            <FiPlusCircle className="mr-2" />
+            <span>Create New Task</span>
+          </h2>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="Task Title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-dark-primary border border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent text-dark-text transition-all duration-200"
+                  required
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity duration-200">
+                  <span className="text-dark-accent">📝</span>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <input
+                  type="date"
+                  name="startDate"
+                  placeholder="Start Date"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-dark-primary border border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent text-dark-text transition-all duration-200"
+                  required
+                />
+              </div>
+              
+              <div>
+                <button
+                  type="submit"
+                  className="w-full px-6 py-3 bg-dark-accent text-dark-primary font-medium rounded-lg hover:shadow-glow-accent transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                  </svg>
+                  Add New Task
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <div className="space-y-10">
+          <div className="animate-slide-up" style={{animationDelay: '200ms'}}>
+            <Dashboard
+              data={activeTasks}
+              handleStart={handleStart}
+              handleStop={handleStop}
+              handleDone={handleDone}
+              handleDrop={handleDrop}
+              timers={timers}
+            />
+          </div>
+
+          <div className="animate-slide-up" style={{animationDelay: '300ms'}}>
+            <CompleteTasks data={completedTasks} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
