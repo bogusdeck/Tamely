@@ -84,13 +84,25 @@ export default function LandingPage() {
         console.log("User signed up:", result.user);
         router.push("/home");
       } else {
-        // Login logic
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        console.log("User logged in:", result.user);
-        router.push("/home");
+        try {
+          // Login logic
+          const result = await signInWithEmailAndPassword(auth, email, password);
+          console.log("User logged in:", result.user);
+          router.push("/home");
+        } catch (loginError) {
+          console.error("Login error:", loginError);
+          // Handle login-specific errors
+          if (loginError.code === 'auth/user-not-found') {
+            setError('Please register first. No account found for this email.');
+            return;
+          }
+          throw loginError; // Re-throw to be caught by the outer catch
+        }
       }
     } catch (error) {
       console.error("Authentication error:", error);
+      console.log("Error code:", error.code); // Debug log
+      console.log("Error message:", error.message); // Debug log
       
       // Handle specific Firebase auth errors with user-friendly messages
       const errorCode = error.code;
@@ -144,16 +156,16 @@ export default function LandingPage() {
               Tamely
             </h1>
           </div>
-          
+
           <h2 className="text-2xl md:text-3xl font-semibold text-dark-text mb-4 animate-slide-in" style={{animationDelay: '0.2s'}}>
             Track Your Time, <span className="text-dark-accent">Master Your Tasks</span>
           </h2>
-          
+
           <p className="text-dark-muted text-lg mb-8 max-w-xl animate-slide-in" style={{animationDelay: '0.3s'}}>
             Tamely helps you manage your tasks efficiently with powerful time tracking, 
             beautiful visualizations, and productivity insights to help you achieve more.
           </p>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 animate-slide-in" style={{animationDelay: '0.4s'}}>
             <div className="flex items-center p-3 rounded-lg bg-dark-secondary bg-opacity-50 hover:bg-opacity-70 transition-all duration-300 transform hover:-translate-y-1">
               <div className="p-2 rounded-full bg-dark-tertiary mr-3 shadow-glow">
