@@ -19,10 +19,10 @@ export default function LandingPage() {
     setAnimationReady(true);
   }, []);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleAuth = async () => {
+    setLoading(true);
+    setError('');
     try {
-      setLoading(true);
-      setError('');
       const result = await signInWithPopup(auth, provider);
       console.log("User signed in:", result.user);
       router.push("/home");
