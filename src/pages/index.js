@@ -39,6 +39,40 @@ export default function LandingPage() {
     setLoading(true);
     setError('');
     
+    // Basic form validation
+    if (!email) {
+      setError('Email is required');
+      setLoading(false);
+      return;
+    }
+    
+    if (!password) {
+      setError('Password is required');
+      setLoading(false);
+      return;
+    }
+    
+    if (isSignUp && !name) {
+      setError('Name is required for signup');
+      setLoading(false);
+      return;
+    }
+    
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+    
+    // Password strength validation for signup
+    if (isSignUp && password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+    
     try {
       if (isSignUp) {
         // Sign up logic
@@ -57,7 +91,34 @@ export default function LandingPage() {
       }
     } catch (error) {
       console.error("Authentication error:", error);
-      setError(error.message.replace('Firebase: ', '').replace(/\(auth.*\)/, ''));
+      
+      // Handle specific Firebase auth errors with user-friendly messages
+      const errorCode = error.code;
+      switch (errorCode) {
+        case 'auth/email-already-in-use':
+          setError('This email is already registered. Please login instead.');
+          break;
+        case 'auth/invalid-email':
+          setError('Please enter a valid email address.');
+          break;
+        case 'auth/user-not-found':
+          setError('Please register first. No account found for this email.');
+          break;
+        case 'auth/wrong-password':
+          setError('Incorrect password. Please try again.');
+          break;
+        case 'auth/weak-password':
+          setError('Password is too weak. Please use at least 6 characters.');
+          break;
+        case 'auth/network-request-failed':
+          setError('Network error. Please check your connection and try again.');
+          break;
+        case 'auth/too-many-requests':
+          setError('Too many failed login attempts. Please try again later.');
+          break;
+        default:
+          setError(error.message.replace('Firebase: ', '').replace(/\(auth.*\)/, ''));
+      }
     } finally {
       setLoading(false);
     }
@@ -144,8 +205,11 @@ export default function LandingPage() {
           </div>
           
           {error && (
-            <div className="mb-4 p-3 bg-red-900 bg-opacity-20 border border-red-800 rounded-md text-red-400 text-sm animate-fade-in">
-              {error}
+            <div className="mb-4 p-3 bg-red-900 bg-opacity-20 border border-red-800 rounded-md text-red-400 text-sm animate-fade-in flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span>{error}</span>
             </div>
           )}
           
@@ -160,8 +224,8 @@ export default function LandingPage() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-dark-secondary border border-dark-border rounded-md py-2 pl-10 pr-3 text-dark-text focus:outline-none focus:border-dark-accent"
-                    placeholder="John Doe"
+                    className={`w-full bg-dark-secondary border rounded-md py-2 pl-10 pr-3 text-dark-text focus:outline-none focus:ring-2 ${error && error.includes('name') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/30' : 'border-dark-border focus:border-dark-accent focus:ring-dark-accent/30'}`}
+                    placeholder="Tanish Vashisth"
                     required={isSignUp}
                   />
                 </div>
@@ -177,7 +241,7 @@ export default function LandingPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-dark-secondary border border-dark-border rounded-md py-2 pl-10 pr-3 text-dark-text focus:outline-none focus:border-dark-accent"
+                  className={`w-full bg-dark-secondary border rounded-md py-2 pl-10 pr-3 text-dark-text focus:outline-none focus:ring-2 ${error && error.includes('email') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/30' : 'border-dark-border focus:border-dark-accent focus:ring-dark-accent/30'}`}
                   placeholder="you@example.com"
                   required
                 />
@@ -193,7 +257,7 @@ export default function LandingPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-dark-secondary border border-dark-border rounded-md py-2 pl-10 pr-3 text-dark-text focus:outline-none focus:border-dark-accent"
+                  className={`w-full bg-dark-secondary border rounded-md py-2 pl-10 pr-3 text-dark-text focus:outline-none focus:ring-2 ${error && error.includes('password') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/30' : 'border-dark-border focus:border-dark-accent focus:ring-dark-accent/30'}`}
                   placeholder="••••••••"
                   required
                 />
