@@ -6,6 +6,9 @@ import {
   browserLocalPersistence,
   signInWithPopup,
   signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
@@ -27,4 +30,16 @@ setPersistence(auth, browserLocalPersistence);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
-export { auth, provider, signInWithPopup, signOut, db, doc, setDoc, getDoc };
+export {
+  auth,
+  provider,
+  signInWithPopup,
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  db,
+  doc,
+  setDoc,
+  getDoc
+};
